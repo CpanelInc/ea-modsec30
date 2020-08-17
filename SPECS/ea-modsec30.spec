@@ -9,6 +9,8 @@ Group: System Environment/Libraries
 License: Apache v2
 URL: https://github.com/SpiderLabs/ModSecurity
 
+Source: https://github.com/SpiderLabs/ModSecurity/archive/v%{version}.tar.gz
+
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 AutoReq:   no
 BuildRequires: gcc-c++ flex bison yajl yajl-devel curl-devel curl GeoIP-devel doxygen zlib-devel pcre-devel
@@ -23,18 +25,12 @@ Libmodsecurity is one component of the ModSecurity v3 project. The library
  via Connectors.
 
 %prep
-git clone https://github.com/SpiderLabs/ModSecurity
-cd ModSecurity
-git checkout -b v3/master origin/v3/master
-git fetch  --tags
-git checkout tags/v%{version} -b v%{version}-branch
-./build.sh
-git submodule init
-git submodule update
+%setup -q -n ModSecurity-%{version}
 
 %build
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/opt/cpanel/ea-modsec3
+./build.sh
 ./configure --prefix=$RPM_BUILD_ROOT/opt/cpanel/ea-modsec3
 make
 
