@@ -9,7 +9,8 @@ Group: System Environment/Libraries
 License: Apache v2
 URL: https://github.com/SpiderLabs/ModSecurity
 
-Source: https://github.com/SpiderLabs/ModSecurity/archive/v%{version}.tar.gz
+Source0: https://github.com/SpiderLabs/ModSecurity/archive/v%{version}.tar.gz
+Source1: submodules.tar.gz
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 AutoReq:   no
@@ -26,6 +27,7 @@ Libmodsecurity is one component of the ModSecurity v3 project. The library
 
 %prep
 %setup -q -n ModSecurity-%{version}
+tar xzf %{SOURCE1}
 
 %build
 rm -rf $RPM_BUILD_ROOT
