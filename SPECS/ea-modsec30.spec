@@ -37,7 +37,7 @@ mkdir -p $RPM_BUILD_ROOT/opt/cpanel/ea-modsec3
 make
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT
+make install
 
 %clean
 rm -rf $RPM_BUILD_ROOT
