@@ -1,3 +1,5 @@
+%define debug_package %{nil}
+
 Name: ea-modsec3
 Summary: libModSecurity v3.0
 Version: 3.0.4
