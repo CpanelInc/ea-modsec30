@@ -18,13 +18,13 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 AutoReq:   no
 
 %if 0%{?rhel} < 8
-BuildRequires: ea-libcurl ea-libcurl-devel ea-brotli
+BuildRequires: ea-libcurl ea-libcurl-devel
 %else
-BuildRequires: curl-devel curl brotli libnghttp2
+BuildRequires: curl-devel curl
 %endif
 
-BuildRequires: gcc-c++ flex bison yajl yajl-devel GeoIP-devel doxygen zlib-devel pcre-devel
-Requires: gcc-c++ flex bison yajl yajl-devel GeoIP-devel doxygen zlib-devel pcre-devel
+BuildRequires: gcc-c++ flex bison yajl yajl-devel GeoIP-devel doxygen zlib-devel pcre-devel ea-nghttp2 ea-brotli
+Requires:      gcc-c++ flex bison yajl yajl-devel GeoIP-devel doxygen zlib-devel pcre-devel ea-nghttp2 ea-brotli
 
 %description
 
