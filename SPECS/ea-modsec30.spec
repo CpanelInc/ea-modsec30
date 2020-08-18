@@ -43,7 +43,7 @@ tar xzf %{SOURCE1}
 ./build.sh
 %if 0%{?rhel} < 8
 ./configure --prefix=/opt/cpanel/ea-modsec30 --with-libxml=/opt/cpanel/ea-libxml2 --with-curl=/opt/cpanel/libcurl
-%elsif
+%else
 ./configure --prefix=/opt/cpanel/ea-modsec30 --with-libxml=/opt/cpanel/ea-libxml2
 %endif
 
