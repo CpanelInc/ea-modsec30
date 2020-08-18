@@ -17,13 +17,18 @@ Source1: submodules.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 AutoReq:   no
 
-%if 0%{?rhel} < 8
-BuildRequires: ea-libcurl ea-libcurl-devel ea-brotli
-%else
-BuildRequires: curl-devel curl brotli libnghttp2
+%if 0%{?rhel} > 7
+# these have ea- couterparts but there is no way to specify them in configure
+BuildRequires: libnghttp2 brotli
+Requires: GeoIP
 %endif
 
-BuildRequires: gcc-c++ flex bison yajl yajl-devel GeoIP-devel doxygen zlib-devel pcre-devel
+# from https://github.com/SpiderLabs/ModSecurity/wiki/Compilation-recipes-for-v3.x#centos-7-minimal
+# --with-curl does not stick in make like --with-libxml does so we can’t do ea-libcurl[-devel]
+BuildRequires: gcc-c++ flex bison yajl yajl-devel curl-devel curl GeoIP-devel doxygen zlib-devel pcre-devel
+
+# the one ea- one that we can specify
+BuildRequires: ea-libxml2 ea-libxml2-devel
 
 %description
 
@@ -40,7 +45,8 @@ tar xzf %{SOURCE1}
 
 %build
 ./build.sh
-./configure --prefix=/opt/cpanel/ea-modsec30
+./configure --prefix=/opt/cpanel/ea-modsec30 --with-libxml=/opt/cpanel/ea-libxml2
+
 make
 
 %install
