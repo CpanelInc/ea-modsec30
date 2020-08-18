@@ -17,12 +17,7 @@ Source1: submodules.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 AutoReq:   no
 
-%if 0%{?rhel} < 8
-BuildRequires: ea-libcurl ea-libcurl-devel
-%else
 BuildRequires: curl-devel curl
-%endif
-
 BuildRequires: brotli gcc-c++ flex bison yajl yajl-devel GeoIP-devel doxygen zlib-devel pcre-devel ea-libxml2 ea-libxml2-devel
 Requires:      brolti gcc-c++ flex bison yajl yajl-devel GeoIP-devel doxygen zlib-devel pcre-devel ea-libxml2 ea-libxml2-devel
 
@@ -41,11 +36,7 @@ tar xzf %{SOURCE1}
 
 %build
 ./build.sh
-%if 0%{?rhel} < 8
-./configure --prefix=/opt/cpanel/ea-modsec30 --with-libxml=/opt/cpanel/ea-libxml2 --with-curl=/opt/cpanel/libcurl
-%else
 ./configure --prefix=/opt/cpanel/ea-modsec30 --with-libxml=/opt/cpanel/ea-libxml2
-%endif
 
 make
 
