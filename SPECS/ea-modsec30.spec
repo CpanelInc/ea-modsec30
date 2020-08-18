@@ -16,8 +16,14 @@ Source1: submodules.tar.gz
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 AutoReq:   no
-BuildRequires: gcc-c++ flex bison yajl yajl-devel curl-devel curl GeoIP-devel doxygen zlib-devel pcre-devel
-BuildRequires: ea-brotli
+
+%if 0%{?rhel} < 8
+BuildRequires: ea-libcurl ea-libcurl-devel ea-brotli
+%else
+BuildRequires: curl-devel curl brotli libnghttp2
+%endif
+
+BuildRequires: gcc-c++ flex bison yajl yajl-devel GeoIP-devel doxygen zlib-devel pcre-devel
 
 %description
 
