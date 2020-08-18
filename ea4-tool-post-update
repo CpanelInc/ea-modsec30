@@ -1,0 +1,76 @@
+#!/usr/local/cpanel/3rdparty/bin/perl
+# cpanel - ea4-tool-post-update                 Copyright(c) 2020 cPanel, L.L.C.
+#                                                           All rights Reserved.
+# copyright@cpanel.net                                         http://cpanel.net
+# This code is subject to the cPanel license. Unauthorized copying is prohibited
+
+package ea_mod_security30::ea4_tool_post_update;
+
+use strict;
+use warnings;
+
+use lib "../ea-tools/lib/ea4_tool";    # assumes ea-tools is checked out next to this repo
+use ea4_tool::util ();
+use File::Temp     ();
+use File::chdir;
+
+exit( run() ? 0 : 1 ) if !caller;
+
+sub run {
+    my $repo_path      = ea4_tool::util::get_path_of_repo("ea-modsec30");
+    my $sm_tarball_rel = "SOURCES/submodules.tar.gz";
+    my $sm_tarball     = "$repo_path/$sm_tarball_rel";
+
+    my $spec    = ea4_tool::util::specfile($CWD);
+    my $version = ea4_tool::util::spec_get_version($spec) || die "Could not determine version from SPEC\n";
+    print "Packaging submodules for v$version\n";
+
+    my $dir = File::Temp->newdir;
+    {
+        local $CWD = $dir;
+        my $git = ea4_tool::util::git_clone( "https://github.com/SpiderLabs/ModSecurity", ".", 1 );
+        $git->run( checkout => "v3/master" );
+        $git->run( fetch    => "--tags" );
+        $git->run( checkout => "tags/v$version", -b => "v$version-branch" );
+
+        $git->run( submodule => "init" );
+        $git->run( submodule => "update" );
+
+        system( tar => "czf", $sm_tarball, "bindings/python", "others/libinjection", "test/test-cases/secrules-language-tests" );
+    }
+
+    print "Committing “$sm_tarball_rel” …\n";
+    my $git    = ea4_tool::util::git($CWD);
+    my $branch = $git->current_branch();
+
+    $git->run( add    => $sm_tarball_rel );
+    $git->run( commit => "-m", "$branch: Updated modsec 3.0 submodules sources" );
+
+    print "Done!\n";
+}
+
+1;
+
+__END__
+
+=encoding utf-8
+
+=head1 README
+
+L<https://github.com/SpiderLabs/ModSecurity> has submodules required at build time.
+
+We can’t use git because OBS is not supposed to need network access.
+
+We can’t maintain seperate packages because:
+
+=over
+
+=item too many packages - each version of modsec would need its own package per submodule since submodules specify the point in the repo it needs
+
+=item too fragile - those points can be any sha/tag/branch (those don’t necessarily corresponde to a release) so the find-latest-verison scritp would have to factor all of that in
+
+=back
+
+So we use this script to grab the submodules for the new version and commit them along side the tarball
+
+=back
