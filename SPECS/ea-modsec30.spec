@@ -17,6 +17,7 @@ Source1: submodules.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 AutoReq:   no
 BuildRequires: gcc-c++ flex bison yajl yajl-devel curl-devel curl GeoIP-devel doxygen zlib-devel pcre-devel
+BuildRequires: ea-brotli
 
 %description
 
@@ -32,14 +33,14 @@ Libmodsecurity is one component of the ModSecurity v3 project. The library
 tar xzf %{SOURCE1}
 
 %build
-rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/opt/cpanel/ea-modsec3
 ./build.sh
-./configure --prefix=$RPM_BUILD_ROOT/opt/cpanel/ea-modsec3
+./configure --prefix=/opt/cpanel/ea-modsec3
 make
 
 %install
-make install
+rm -rf $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT/opt/cpanel/ea-modsec3
+make DESTDIR=$RPM_BUILD_ROOT install
 
 %clean
 rm -rf $RPM_BUILD_ROOT
