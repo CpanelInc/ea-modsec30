@@ -20,6 +20,7 @@ AutoReq:   no
 %if 0%{?rhel} > 7
 # these have ea- couterparts but there is no way to specify them in configure
 BuildRequires: libnghttp2 brotli
+Requires: GeoIP
 %endif
 
 # from https://github.com/SpiderLabs/ModSecurity/wiki/Compilation-recipes-for-v3.x#centos-7-minimal
