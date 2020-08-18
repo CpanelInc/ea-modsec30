@@ -23,8 +23,8 @@ BuildRequires: ea-libcurl ea-libcurl-devel
 BuildRequires: curl-devel curl
 %endif
 
-BuildRequires: gcc-c++ flex bison yajl yajl-devel GeoIP-devel doxygen zlib-devel pcre-devel ea-nghttp2 ea-brotli ea-libxml2 ea-libxml2-devel
-Requires:      gcc-c++ flex bison yajl yajl-devel GeoIP-devel doxygen zlib-devel pcre-devel ea-nghttp2 ea-brotli ea-libxml2 ea-libxml2-devel
+BuildRequires: brotli gcc-c++ flex bison yajl yajl-devel GeoIP-devel doxygen zlib-devel pcre-devel ea-libxml2 ea-libxml2-devel
+Requires:      brolti gcc-c++ flex bison yajl yajl-devel GeoIP-devel doxygen zlib-devel pcre-devel ea-libxml2 ea-libxml2-devel
 
 %description
 
