@@ -1,6 +1,6 @@
 %define debug_package %{nil}
 
-Name: ea-modsec3
+Name: ea-modsec30
 Summary: libModSecurity v3.0
 Version: 3.0.4
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
@@ -34,12 +34,12 @@ tar xzf %{SOURCE1}
 
 %build
 ./build.sh
-./configure --prefix=/opt/cpanel/ea-modsec3
+./configure --prefix=/opt/cpanel/ea-modsec30
 make
 
 %install
 rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/opt/cpanel/ea-modsec3
+mkdir -p $RPM_BUILD_ROOT/opt/cpanel/ea-modsec30
 make DESTDIR=$RPM_BUILD_ROOT install
 
 %clean
@@ -47,7 +47,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-, root, root, -)
-/opt/cpanel/ea-modsec3
+/opt/cpanel/ea-modsec30
 
 %changelog
 * Mon Aug 17 2020 Daniel Muey <dan@cpanel.net> - 3.0.4-1
