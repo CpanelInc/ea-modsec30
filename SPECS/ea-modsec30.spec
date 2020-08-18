@@ -24,6 +24,7 @@ BuildRequires: curl-devel curl brotli libnghttp2
 %endif
 
 BuildRequires: gcc-c++ flex bison yajl yajl-devel GeoIP-devel doxygen zlib-devel pcre-devel
+Requires: gcc-c++ flex bison yajl yajl-devel GeoIP-devel doxygen zlib-devel pcre-devel
 
 %description
 
