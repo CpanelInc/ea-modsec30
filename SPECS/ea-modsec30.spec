@@ -23,8 +23,8 @@ BuildRequires: ea-libcurl ea-libcurl-devel
 BuildRequires: curl-devel curl
 %endif
 
-BuildRequires: gcc-c++ flex bison yajl yajl-devel GeoIP-devel doxygen zlib-devel pcre-devel ea-nghttp2 ea-brotli
-Requires:      gcc-c++ flex bison yajl yajl-devel GeoIP-devel doxygen zlib-devel pcre-devel ea-nghttp2 ea-brotli
+BuildRequires: gcc-c++ flex bison yajl yajl-devel GeoIP-devel doxygen zlib-devel pcre-devel ea-nghttp2 ea-brotli ea-libxml2 ea-libxml2-devel
+Requires:      gcc-c++ flex bison yajl yajl-devel GeoIP-devel doxygen zlib-devel pcre-devel ea-nghttp2 ea-brotli ea-libxml2 ea-libxml2-devel
 
 %description
 
@@ -41,7 +41,12 @@ tar xzf %{SOURCE1}
 
 %build
 ./build.sh
-./configure --prefix=/opt/cpanel/ea-modsec30
+%if 0%{?rhel} < 8
+./configure --prefix=/opt/cpanel/ea-modsec30 --with-libxml=/opt/cpanel/ea-libxml2 --with-curl=/opt/cpanel/libcurl
+%elsif
+./configure --prefix=/opt/cpanel/ea-modsec30 --with-libxml=/opt/cpanel/ea-libxml2
+%endif
+
 make
 
 %install
