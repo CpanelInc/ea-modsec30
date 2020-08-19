@@ -26,6 +26,7 @@ Requires: GeoIP
 # from https://github.com/SpiderLabs/ModSecurity/wiki/Compilation-recipes-for-v3.x#centos-7-minimal
 # --with-curl does not stick in make like --with-libxml does so we can’t do ea-libcurl[-devel]
 BuildRequires: gcc-c++ flex bison yajl yajl-devel curl-devel curl GeoIP-devel doxygen zlib-devel pcre-devel
+Requires: yajl
 
 # the one ea- one that we can specify
 BuildRequires: ea-libxml2 ea-libxml2-devel
