@@ -31,6 +31,9 @@ Requires: yajl
 # the one ea- one that we can specify
 BuildRequires: ea-libxml2 ea-libxml2-devel
 
+Provides: mod_security
+Conflicts: mod_security
+
 %description
 
 Libmodsecurity is one component of the ModSecurity v3 project. The library
