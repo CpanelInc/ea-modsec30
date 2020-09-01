@@ -4,7 +4,7 @@ Name: ea-modsec30
 Summary: libModSecurity v3.0
 Version: 3.0.4
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 Group: System Environment/Libraries
@@ -33,6 +33,9 @@ BuildRequires: ea-libxml2 ea-libxml2-devel
 
 Provides: mod_security
 Conflicts: mod_security
+
+# WHM only factors in real package names so:
+Conflicts: ea-apache24-mod_security2 ea-modsec31
 
 %description
 
@@ -66,6 +69,9 @@ rm -rf $RPM_BUILD_ROOT
 /opt/cpanel/ea-modsec30
 
 %changelog
+* Tue Sep 01 2020 Daniel Muey <dan@cpanel.net> - 3.0.4-2
+- ZC-7376: Add explicit package name conflicts for non-yum resolution
+
 * Mon Aug 17 2020 Daniel Muey <dan@cpanel.net> - 3.0.4-1
 - ZC-7365: initial release
 
