@@ -4,7 +4,7 @@ Name: ea-modsec30
 Summary: libModSecurity v3.0
 Version: 3.0.4
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 Group: System Environment/Libraries
@@ -25,8 +25,8 @@ Requires: GeoIP
 
 # from https://github.com/SpiderLabs/ModSecurity/wiki/Compilation-recipes-for-v3.x#centos-7-minimal
 # --with-curl does not stick in make like --with-libxml does so we can’t do ea-libcurl[-devel]
-BuildRequires: gcc-c++ flex bison yajl yajl-devel curl-devel curl GeoIP-devel doxygen zlib-devel pcre-devel
-Requires: yajl
+BuildRequires: gcc-c++ flex bison yajl yajl-devel curl-devel curl GeoIP-devel doxygen zlib-devel pcre-devel lua lua-devel
+Requires: yajl lua
 
 # the one ea- one that we can specify
 BuildRequires: ea-libxml2 ea-libxml2-devel
@@ -50,6 +50,10 @@ Libmodsecurity is one component of the ModSecurity v3 project. The library
 %setup -q -n ModSecurity-%{version}
 tar xzf %{SOURCE1}
 
+# hack in https://github.com/SpiderLabs/ModSecurity/pull/2378/commits/9d78228bf066bb24f89e36ea130c48d0ca7f719b
+# to support SecGeoLookupDb having a value of /usr/local/cpanel/3rdparty/share/geoipfree/IpToCountry.dat
+perl -pi -e 's/GEOIP_INDEX_CACHE/GEOIP_MEMORY_CACHE/' src/utils/geo_lookup.cc
+
 %build
 ./build.sh
 ./configure --prefix=/opt/cpanel/ea-modsec30 --with-libxml=/opt/cpanel/ea-libxml2
@@ -69,6 +73,10 @@ rm -rf $RPM_BUILD_ROOT
 /opt/cpanel/ea-modsec30
 
 %changelog
+* Thu Sep 10 2020 Daniel Muey <dan@cpanel.net> - 3.0.4-3
+- ZC-7506: Support `/usr/local/cpanel/3rdparty/share/geoipfree/IpToCountry.dat` as a value for `SecGeoLookupDb`
+- ZC-7507: Add lua support
+
 * Tue Sep 01 2020 Daniel Muey <dan@cpanel.net> - 3.0.4-2
 - ZC-7376: Add explicit package name conflicts for non-yum resolution
 
