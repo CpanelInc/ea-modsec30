@@ -4,7 +4,7 @@ Name: ea-modsec30
 Summary: libModSecurity v3.0
 Version: 3.0.4
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 3
+%define release_prefix 4
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 Group: System Environment/Libraries
@@ -13,6 +13,8 @@ URL: https://github.com/SpiderLabs/ModSecurity
 
 Source0: https://github.com/SpiderLabs/ModSecurity/archive/v%{version}.tar.gz
 Source1: submodules.tar.gz
+
+Patch0: 0001-Patch-ModSecurity-3.0.4-for-CVE-2020-15598.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 AutoReq:   no
@@ -50,6 +52,8 @@ Libmodsecurity is one component of the ModSecurity v3 project. The library
 %setup -q -n ModSecurity-%{version}
 tar xzf %{SOURCE1}
 
+%patch0 -p1 -b .patch-cve-2020-15598
+
 # hack in https://github.com/SpiderLabs/ModSecurity/pull/2378/commits/9d78228bf066bb24f89e36ea130c48d0ca7f719b
 # to support SecGeoLookupDb having a value of /usr/local/cpanel/3rdparty/share/geoipfree/IpToCountry.dat
 perl -pi -e 's/GEOIP_INDEX_CACHE/GEOIP_MEMORY_CACHE/' src/utils/geo_lookup.cc
@@ -73,6 +77,9 @@ rm -rf $RPM_BUILD_ROOT
 /opt/cpanel/ea-modsec30
 
 %changelog
+* Tue Sep 15 2020 Tim Mullin <tim@cpanel.net> - 3.0.4-4
+- EA-9302: Patch modsec30 for CVE-2020-15598
+
 * Thu Sep 10 2020 Daniel Muey <dan@cpanel.net> - 3.0.4-3
 - ZC-7506: Support `/usr/local/cpanel/3rdparty/share/geoipfree/IpToCountry.dat` as a value for `SecGeoLookupDb`
 - ZC-7507: Add lua support
