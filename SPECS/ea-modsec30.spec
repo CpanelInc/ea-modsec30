@@ -4,7 +4,7 @@ Name: ea-modsec30
 Summary: libModSecurity v3.0
 Version: 3.0.4
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 4
+%define release_prefix 5
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 Group: System Environment/Libraries
@@ -69,6 +69,8 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/opt/cpanel/ea-modsec30
 make DESTDIR=$RPM_BUILD_ROOT install
 
+ln -s /opt/cpanel/ea-modsec30/lib $RPM_BUILD_ROOT/opt/cpanel/ea-modsec30/lib64
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -77,6 +79,9 @@ rm -rf $RPM_BUILD_ROOT
 /opt/cpanel/ea-modsec30
 
 %changelog
+* Wed Sep 30 2020 Daniel Muey <dan@cpanel.net> - 3.0.4-5
+- ZC-7669: Ensure lib64 works
+
 * Tue Sep 15 2020 Tim Mullin <tim@cpanel.net> - 3.0.4-4
 - EA-9302: Patch modsec30 for CVE-2020-15598
 
