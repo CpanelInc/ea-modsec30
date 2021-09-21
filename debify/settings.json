@@ -1,0 +1,42 @@
+{
+    "source_tarball_regex": "v3\\.",
+    "remove_from_requires": [
+        "GeoIP",
+        "libnghttp2"
+    ],
+    "add_to_requires": {
+        "ea-modsec30": [
+            "geoip-bin",
+            "geoip-database",
+            "libcurl4",
+            "libmaxminddb0",
+            "libpcre3",
+            "libxml2",
+            "libyajl2",
+            "lua5.3",
+            "yajl-tools"
+        ]
+    },
+    "add_to_build_requires": [
+        "g++",
+        "gcc-10",
+        "geoip-bin",
+        "geoip-database",
+        "git",
+        "libcurl4",
+        "libcurl4-openssl-dev",
+        "libgeoip-dev",
+        "libmaxminddb0",
+        "libmaxminddb-dev",
+        "libnghttp2-14",
+        "libpcre3",
+        "libpcre3-dev",
+        "libxml2",
+        "libxml2-dev",
+        "libyajl2",
+        "libyajl-dev",
+        "lua5.3",
+        "pkg-config",
+        "yajl-tools"
+    ]
+}
