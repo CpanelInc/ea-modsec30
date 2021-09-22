@@ -40,9 +40,9 @@
         "yajl-tools"
     ],
     "add_to_conflicts": {
-        "ea-modsec30": [ "mod_security", "ea-apache24-mod-security2", "ea-modsec31" ]
+        "ea-modsec30": [ "mod-security", "ea-apache24-mod-security2", "ea-modsec31" ]
     },
     "add_to_provides": {
-        "ea-modsec30": [ "mod_security" ]
+        "ea-modsec30": [ "mod-security" ]
     }
 }
