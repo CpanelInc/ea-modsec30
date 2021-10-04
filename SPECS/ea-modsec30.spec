@@ -14,8 +14,6 @@ URL: https://github.com/SpiderLabs/ModSecurity
 Source0: https://github.com/SpiderLabs/ModSecurity/archive/v%{version}.tar.gz
 Source1: submodules.tar.gz
 
-Patch0: 0001-Patch-ModSecurity-3.0.4-for-CVE-2020-15598.patch
-
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 AutoReq:   no
 
@@ -51,8 +49,6 @@ Libmodsecurity is one component of the ModSecurity v3 project. The library
 %prep
 %setup -q -n ModSecurity-%{version}
 tar xzf %{SOURCE1}
-
-%patch0 -p1 -b .patch-cve-2020-15598
 
 # hack in https://github.com/SpiderLabs/ModSecurity/pull/2378/commits/9d78228bf066bb24f89e36ea130c48d0ca7f719b
 # to support SecGeoLookupDb having a value of /usr/local/cpanel/3rdparty/share/geoipfree/IpToCountry.dat
