@@ -4,7 +4,7 @@ Name: ea-modsec30
 Summary: libModSecurity v3.0
 Version: 3.0.5
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 Group: System Environment/Libraries
@@ -13,6 +13,7 @@ URL: https://github.com/SpiderLabs/ModSecurity
 
 Source0: https://github.com/SpiderLabs/ModSecurity/archive/v%{version}.tar.gz
 Source1: submodules.tar.gz
+Source5: modsec30.cpanel.conf.tt
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 AutoReq:   no
@@ -69,15 +70,22 @@ ln -s /opt/cpanel/ea-modsec30/lib $RPM_BUILD_ROOT/opt/cpanel/ea-modsec30/lib64
 mkdir -p $RPM_BUILD_ROOT/etc/cpanel/ea4
 echo -n %{version} > $RPM_BUILD_ROOT/etc/cpanel/ea4/modsecurity.version
 
+mkdir -p $RPM_BUILD_ROOT/var/cpanel/templates/apache2_4
+/bin/cp -rf %{SOURCE5} $RPM_BUILD_ROOT/var/cpanel/templates/apache2_4/modsec.cpanel.conf.tt
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-, root, root, -)
 /opt/cpanel/ea-modsec30
+/var/cpanel/templates/apache2_4/modsec.cpanel.conf.tt
 /etc/cpanel/ea4/modsecurity.version
 
 %changelog
+* Tue Nov 02 2021 Julian Brown <julian.brown@cpanel.net> - 3.0.5-2
+- ZC-9451: Move modsec30 template to ea-modsec30
+
 * Mon Oct 04 2021 Cory McIntire <cory@cpanel.net> - 3.0.5-1
 - EA-10158: Update ea-modsec30 from v3.0.4 to v3.0.5
 
