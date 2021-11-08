@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ -x "/usr/bin/apt" ]; then
+    mkdir -p /etc/apache2/conf.d/modsec
+    touch /etc/apache2/conf.d/modsec/modsec2.cpanel.conf
+fi
+
