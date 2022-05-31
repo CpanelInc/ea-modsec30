@@ -2,9 +2,9 @@
 
 Name: ea-modsec30
 Summary: libModSecurity v3.0
-Version: 3.0.6
+Version: 3.0.7
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 Group: System Environment/Libraries
@@ -83,6 +83,9 @@ rm -rf $RPM_BUILD_ROOT
 /etc/cpanel/ea4/modsecurity.version
 
 %changelog
+* Tue May 31 2022 Cory McIntire <cory@cpanel.net> - 3.0.7-1
+- EA-10739: Update ea-modsec30 from v3.0.6 to v3.0.7
+
 * Thu Dec 16 2021 Dan Muey <dan@cpanel.net> - 3.0.6-2
 - ZC-9203: Update DISABLE_BUILD to match OBS
 
