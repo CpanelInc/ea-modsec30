@@ -2,7 +2,7 @@
 
 Name: ea-modsec30
 Summary: libModSecurity v3.0
-Version: 3.0.7
+Version: 3.0.8
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
 %define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
@@ -83,6 +83,9 @@ rm -rf $RPM_BUILD_ROOT
 /etc/cpanel/ea4/modsecurity.version
 
 %changelog
+* Thu Sep 08 2022 Cory McIntire <cory@cpanel.net> - 3.0.8-1
+- EA-10927: Update ea-modsec30 from v3.0.7 to v3.0.8
+
 * Tue May 31 2022 Cory McIntire <cory@cpanel.net> - 3.0.7-1
 - EA-10739: Update ea-modsec30 from v3.0.6 to v3.0.7
 
