@@ -4,7 +4,7 @@ Name: ea-modsec30
 Summary: libModSecurity v3.0
 Version: 3.0.8
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 Group: System Environment/Libraries
@@ -21,12 +21,18 @@ AutoReq:   no
 %if 0%{?rhel} > 7
 # these have ea- couterparts but there is no way to specify them in configure
 BuildRequires: libnghttp2 brotli
+%if 0%{?rhel} == 8
 Requires: GeoIP
+%endif
 %endif
 
 # from https://github.com/SpiderLabs/ModSecurity/wiki/Compilation-recipes-for-v3.x#centos-7-minimal
 # --with-curl does not stick in make like --with-libxml does so we can’t do ea-libcurl[-devel]
+%if 0%{?rhel} == 9
+BuildRequires: gcc-c++ flex bison yajl yajl-devel curl-devel curl doxygen zlib-devel pcre-devel lua lua-devel
+%else
 BuildRequires: gcc-c++ flex bison yajl yajl-devel curl-devel curl GeoIP-devel doxygen zlib-devel pcre-devel lua lua-devel
+%endif
 Requires: yajl lua
 
 # the one ea- one that we can specify
@@ -83,6 +89,9 @@ rm -rf $RPM_BUILD_ROOT
 /etc/cpanel/ea4/modsecurity.version
 
 %changelog
+* Thu Sep 29 2022 Julian Brown <julian.brown@cpanel.net> - 3.0.9-2
+- ZC-10336: Add changes so that it builds on AlmaLinux 9
+
 * Thu Sep 08 2022 Cory McIntire <cory@cpanel.net> - 3.0.8-1
 - EA-10927: Update ea-modsec30 from v3.0.7 to v3.0.8
 
