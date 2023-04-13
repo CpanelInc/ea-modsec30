@@ -46,6 +46,8 @@ sub run {
     $git->run( add    => $sm_tarball_rel );
     $git->run( commit => "-m", "$branch: Updated modsec 3.0 submodules sources" );
 
+    ea4_tool::util::pushup( $git, $branch );
+
     print "Done!\n";
 }
 
