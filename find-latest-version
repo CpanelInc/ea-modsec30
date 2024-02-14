@@ -21,17 +21,30 @@ ea4_tool::util::find_latest_version( \&_get_required, \&_add_sum ) if !caller();
 sub _get_required {
     my ($http) = @_;
 
-    my $res = $http->get("https://api.github.com/repos/SpiderLabs/ModSecurity/releases");
+    my $res = $http->get("https://api.github.com/repos/owasp-modsecurity/ModSecurity/releases");
     if ( !$res->{success} ) {
         die "Could not GET ModSecurity info from github ($res->{status} $res->{reason})\n\t Throttled? `curl -I https://api.github.com/rate_limit 2>&1 | grep ^X-RateLimit`\n";
     }
 
     # get $version, $url, $name from $res
-    my ($version) = sort { $b cmp $a } map { $_->{tag_name} } grep { $_->{tag_name} =~ m/v3\.0/ } @{ ea4_tool::util::json2ref( $res->{content} ) };
+    my @data = map { $_->{tag_name} } grep { $_->{tag_name} =~ m/v3\.0/ } @{ ea4_tool::util::json2ref( $res->{content} ) };
+    my @sorted_data = sort {
+        my ($a_major, $a_minor, $a_nano) = split (/\./, $a);
+        my ($b_major, $b_minor, $b_nano) = split (/\./, $b);
+
+        ($a_nano) = split (/-/, $a_nano);
+        ($b_nano) = split (/-/, $b_nano);
+
+        return -1 if ($b_nano < $a_nano);
+        return 1 if ($b_nano > $a_nano);
+        return 0;
+    } @data;
+
+    my ($version) = @sorted_data;
     die "Could not determine version from github\n" if !$version;
 
     my $name = "$version.tar.gz";
-    my $url  = "https://github.com/SpiderLabs/ModSecurity/archive/$name";
+    my $url  = "https://github.com/owasp-modsecurity/ModSecurity/archive/$name";
     $version =~ s/^v//;
 
     return ( $version, $url, $name );
@@ -59,6 +72,6 @@ We can add checksum support if github releases had that information which isn’
 
 =item API call L<https://developer.github.com/v3/repos/releases/#get-the-latest-release>
 
-=item web view L<https://github.com/SpiderLabs/ModSecurity/releases>
+=item web view L<https://github.com/owasp-modsecurity/ModSecurity/releases>
 
 =back
