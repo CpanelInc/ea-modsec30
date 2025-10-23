@@ -1,8 +1,9 @@
 %define debug_package %{nil}
+%undefine __brp_remove_rpath
 
 Name: ea-modsec30
 Summary: libModSecurity v3.0
-Version: 3.0.12
+Version: 3.0.14
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
 %define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
@@ -26,17 +27,24 @@ Requires: GeoIP
 %endif
 %endif
 
+%if %{?rhel} == 7
+BuildRequires: kernel-devel devtoolset-9
+%else
+BuildRequires: gcc-c++
+%endif
+
 # from https://github.com/SpiderLabs/ModSecurity/wiki/Compilation-recipes-for-v3.x#centos-7-minimal
 # --with-curl does not stick in make like --with-libxml does so we can’t do ea-libcurl[-devel]
-%if 0%{?rhel} == 9
-BuildRequires: gcc-c++ flex bison yajl yajl-devel curl-devel curl doxygen zlib-devel pcre-devel lua lua-devel
+%if %{?rhel} == 9
+BuildRequires: flex bison yajl yajl-devel curl-devel curl doxygen zlib-devel pcre-devel lua lua-devel
 %else
-BuildRequires: gcc-c++ flex bison yajl yajl-devel curl-devel curl GeoIP-devel doxygen zlib-devel pcre-devel lua lua-devel
+BuildRequires: flex bison yajl yajl-devel curl-devel curl GeoIP-devel doxygen zlib-devel pcre-devel lua lua-devel
 %endif
 Requires: yajl lua
 
 # the one ea- one that we can specify
 BuildRequires: ea-libxml2 ea-libxml2-devel
+Requires: ea-libxml2
 
 Provides: mod_security
 Conflicts: mod_security
@@ -62,6 +70,15 @@ tar xzf %{SOURCE1}
 perl -pi -e 's/GEOIP_INDEX_CACHE/GEOIP_MEMORY_CACHE/' src/utils/geo_lookup.cc
 
 %build
+%if %{?rhel} == 7
+source /opt/rh/devtoolset-9/enable
+%endif
+
+export LDFLAGS="$LDFLAGS \
+    -Wl,--enable-new-dtags \
+    -Wl,-rpath,/opt/cpanel/ea-libxml2/lib \
+    -Wl,-rpath,/opt/cpanel/ea-libxml2/lib64"
+
 ./build.sh
 ./configure --prefix=/opt/cpanel/ea-modsec30 --with-libxml=/opt/cpanel/ea-libxml2
 
@@ -89,6 +106,9 @@ rm -rf $RPM_BUILD_ROOT
 /etc/cpanel/ea4/modsecurity.version
 
 %changelog
+* Thu Oct 23 2025 Chris Castillo <chris.castillo@webpros.com> - 3.0.14-1
+- EA-12738: Update ea-modsec30 to v3.0.14
+
 * Wed Feb 28 2024 Cory McIntire <cory@cpanel.net> - 3.0.12-1
 - EA-11990: Update ea-modsec30 from v3.0.9 to v3.0.12
 
