@@ -5,7 +5,7 @@ Name: ea-modsec30
 Summary: libModSecurity v3.0
 Version: 3.0.15
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 Group: System Environment/Libraries
@@ -36,11 +36,11 @@ BuildRequires: gcc-c++
 # from https://github.com/SpiderLabs/ModSecurity/wiki/Compilation-recipes-for-v3.x#centos-7-minimal
 # --with-curl does not stick in make like --with-libxml does so we can’t do ea-libcurl[-devel]
 %if %{?rhel} == 9
-BuildRequires: flex bison yajl yajl-devel curl-devel curl doxygen zlib-devel pcre-devel lua lua-devel
+BuildRequires: flex bison yajl yajl-devel curl-devel curl doxygen zlib-devel pcre2-devel lua lua-devel
 %else
-BuildRequires: flex bison yajl yajl-devel curl-devel curl GeoIP-devel doxygen zlib-devel pcre-devel lua lua-devel
+BuildRequires: flex bison yajl yajl-devel curl-devel curl GeoIP-devel doxygen zlib-devel pcre2-devel lua lua-devel
 %endif
-Requires: yajl lua
+Requires: yajl lua pcre2
 
 # the one ea- one that we can specify
 BuildRequires: ea-libxml2 ea-libxml2-devel
@@ -106,6 +106,9 @@ rm -rf $RPM_BUILD_ROOT
 /etc/cpanel/ea4/modsecurity.version
 
 %changelog
+* Tue May 19 2026 Cory McIntire <cory.mcintire@webpros.com> - 3.0.15-2
+- EA-13435: Switch pcre-devel to pcre2-devel; ModSecurity 3.0.15 requires PCRE2
+
 * Wed May 13 2026 EA4 Update Bot <cory.mcintire@webpros.com> - 3.0.15-1
 - EA-13435: Update ea-modsec30 from v3.0.14 to v3.0.15
 
