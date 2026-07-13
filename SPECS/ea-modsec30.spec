@@ -5,7 +5,7 @@ Name: ea-modsec30
 Summary: libModSecurity v3.0
 Version: 3.0.16
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 Group: System Environment/Libraries
@@ -15,6 +15,19 @@ URL: https://github.com/SpiderLabs/ModSecurity
 Source0: https://github.com/SpiderLabs/ModSecurity/archive/v%{version}.tar.gz
 Source1: submodules.tar.gz
 Source5: modsec30.cpanel.conf.tt
+
+# EA-13497: on cPanel's multi-tenant Apache setup (mod_ruid2), the per-day/
+# per-time-bucket SecAuditLogStorageDir subdirectories are created at runtime
+# by whichever account's request happens to be first, under that process's
+# default umask (0022). That silently strips any group/other write bits from
+# the requested directory mode before mkdir() ever sees it, so any later
+# request running as a different account's UID gets a silent, default-
+# verbosity-invisible "Permission denied" trying to create its own time-
+# bucket subdirectory - losing that transaction's audit log entry with no
+# admin-visible error. Force the requested mode through verbatim for these
+# two mkdir calls (matching the sticky+world-writable model this stack
+# already uses for the top-level SecAuditLogStorageDir itself).
+Patch0: 0001-Force-umask-0-for-audit-log-directory-creation.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 AutoReq:   no
@@ -64,6 +77,7 @@ Libmodsecurity is one component of the ModSecurity v3 project. The library
 %prep
 %setup -q -n ModSecurity-%{version}
 tar xzf %{SOURCE1}
+%patch0 -p1
 
 # hack in https://github.com/SpiderLabs/ModSecurity/pull/2378/commits/9d78228bf066bb24f89e36ea130c48d0ca7f719b
 # to support SecGeoLookupDb having a value of /usr/local/cpanel/3rdparty/share/geoipfree/IpToCountry.dat
@@ -106,6 +120,9 @@ rm -rf $RPM_BUILD_ROOT
 /etc/cpanel/ea4/modsecurity.version
 
 %changelog
+* Mon Jul 13 2026 Cory McIntire <cory.mcintire@webpros.com> - 3.0.16-2
+- EA-13497: Force umask 0 around SecAuditLogStorageDir's per-day/time-bucket mkdir() calls so a configured directory mode is not silently stripped by the process's default umask, which previously left those directories unwritable by any account UID other than whichever request created them first
+
 * Thu Jul 09 2026 EA4 Update Bot <cory.mcintire@webpros.com> - 3.0.16-1
 - EA-13492: Update ea-modsec30 from v3.0.15 to v3.0.16
 
