@@ -34,7 +34,7 @@ sub run {
         $git->run( checkout => "tags/v$version", -b => "v$version-branch" );
 
         $git->run( submodule => "init" );
-        $git->run( submodule => "update", "--recursive" );
+        $git->run( submodule => "update", "--init", "--recursive" );
 
         system( tar => "czf", $sm_tarball, "bindings/python", "others/libinjection", "others/mbedtls", "test/test-cases/secrules-language-tests" );
     }
