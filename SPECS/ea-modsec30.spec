@@ -5,7 +5,7 @@ Name: ea-modsec30
 Summary: libModSecurity v3.0
 Version: 3.0.16
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 Group: System Environment/Libraries
@@ -24,10 +24,15 @@ Source5: modsec30.cpanel.conf.tt
 # request running as a different account's UID gets a silent, default-
 # verbosity-invisible "Permission denied" trying to create its own time-
 # bucket subdirectory - losing that transaction's audit log entry with no
-# admin-visible error. Force the requested mode through verbatim for these
-# two mkdir calls (matching the sticky+world-writable model this stack
-# already uses for the top-level SecAuditLogStorageDir itself).
-Patch0: 0001-Force-umask-0-for-audit-log-directory-creation.patch
+# admin-visible error. A first attempt at this fix wrapped the mkdir calls
+# in umask(0)/restore; that is correct in isolation (proven live via
+# strace) but was superseded here by an explicit chmod() after each
+# createDir() call, which is idempotent, thread-safe regardless of MPM
+# model, and self-healing on every logged transaction - it forces the
+# final directory mode to the configured SecAuditLogDirMode/
+# getDirectoryPermission() value every time, independent of whatever
+# umask created the directory.
+Patch0: 0001-Force-chmod-01733-for-audit-log-directory-creation.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 AutoReq:   no
@@ -120,6 +125,9 @@ rm -rf $RPM_BUILD_ROOT
 /etc/cpanel/ea4/modsecurity.version
 
 %changelog
+* Mon Jul 13 2026 Cory McIntire <cory.mcintire@webpros.com> - 3.0.16-3
+- EA-13497: Replace the umask(0)/restore around SecAuditLogStorageDir's per-day/time-bucket mkdir() calls with an explicit chmod() to the configured directory mode after each call - idempotent, thread-safe under any MPM, and self-healing on every logged transaction, so a different account UID can always write into these directories regardless of the process's default umask
+
 * Mon Jul 13 2026 Cory McIntire <cory.mcintire@webpros.com> - 3.0.16-2
 - EA-13497: Force umask 0 around SecAuditLogStorageDir's per-day/time-bucket mkdir() calls so a configured directory mode is not silently stripped by the process's default umask, which previously left those directories unwritable by any account UID other than whichever request created them first
 

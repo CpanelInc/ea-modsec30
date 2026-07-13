@@ -1,0 +1,42 @@
+--- a/src/audit_log/writer/parallel.cc
++++ b/src/audit_log/writer/parallel.cc
+@@ -137,6 +137,26 @@
+     if (ret == false) {
+         return false;
+     }
++    // cPanel/WebPros (EA-13497): on a shared-hosting box, each virtual
++    // host's requests run as that account's own UID (mod_ruid2), so this
++    // day directory may be created by whichever account's request happens
++    // to be first, and every subsequent request under a different UID
++    // needs to create its own time-bucket subdirectory (and audit file)
++    // inside it. utils::createDir() is a plain mkdir(path, mode) call, so
++    // its result is silently reduced by the calling process's umask (0022
++    // for a standard httpd worker) before the mode ever reaches the
++    // directory - no SecAuditLogDirMode value can produce a group/other
++    // writable result under that umask, since umask only removes bits and
++    // never adds them back. A umask(0)/restore wrapped only around the
++    // mkdir call is process-wide for the moment it's unmasked, which is an
++    // avoidable window in any threaded MPM. chmod() after the fact is
++    // idempotent, thread-safe regardless of MPM model, and self-healing on
++    // every logged transaction, so the final directory mode is always
++    // deterministically what SecAuditLogDirMode/getDirectoryPermission()
++    // requested, independent of whatever umask created it.
++    chmod((logPath +
++        logFilePath(&transaction->m_timeStamp, YearMonthDayDirectory)).c_str(),
++        m_audit->getDirectoryPermission());
+     ret = utils::createDir((logPath +
+         logFilePath(&transaction->m_timeStamp, YearMonthDayDirectory
+             | YearMonthDayAndTimeDirectory)).c_str(),
+@@ -145,6 +165,12 @@
+     if (ret == false) {
+         return false;
+     }
++    // cPanel/WebPros (EA-13497): same rationale as above, for the
++    // per-time-bucket subdirectory.
++    chmod((logPath +
++        logFilePath(&transaction->m_timeStamp, YearMonthDayDirectory
++            | YearMonthDayAndTimeDirectory)).c_str(),
++        m_audit->getDirectoryPermission());
+
+     fd = open(fileName.c_str(), O_CREAT | O_WRONLY | O_APPEND,
+         m_audit->getFilePermission());
