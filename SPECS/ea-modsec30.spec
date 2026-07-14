@@ -5,7 +5,7 @@ Name: ea-modsec30
 Summary: libModSecurity v3.0
 Version: 3.0.16
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 3
+%define release_prefix 4
 Release: %{release_prefix}%{?dist}.cpanel
 Vendor: cPanel, Inc.
 Group: System Environment/Libraries
@@ -118,6 +118,31 @@ mkdir -p $RPM_BUILD_ROOT/var/cpanel/templates/apache2_4
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%posttrans
+# EA-13497: a plain package update alone does not activate a fix shipped
+# inside this package's libmodsecurity.so on an already-running httpd. The
+# only restart trigger in the ea-modsec30 family is the connector's own
+# post-transaction scriptlet, which calls Cpanel::HttpUtils::ApRestart's
+# BgSafe path - a graceful (kill -USR1) reload. A graceful reload re-reads
+# config and rule files, but it cannot make an already-running httpd
+# master process re-dlopen a shared library it has held mapped since
+# Apache last started. Proven end to end (master PID before/after a real
+# restart, plus strace evidence) in the EA-13492 smold4r investigation -
+# see work/handoffs/EA-13492-modsec-rules-investigation.md.
+#
+# Force a genuine full stop-then-start (not a graceful reload) so a new
+# libmodsecurity.so actually gets loaded by a fresh httpd master process.
+# Guarded to be a safe no-op outside a real cPanel install with Apache
+# already running: restartsrv_httpd is absent in the OBS build/install
+# chroot, and this must never be used to start httpd on a box where it
+# was not already running (e.g. an nginx-only or httpd-disabled box).
+if [ -x /usr/local/cpanel/scripts/restartsrv_httpd ] && pgrep -x httpd >/dev/null 2>&1; then
+    /usr/local/cpanel/scripts/restartsrv_httpd --stop  >/dev/null 2>&1
+    /usr/local/cpanel/scripts/restartsrv_httpd --start >/dev/null 2>&1
+fi
+
+exit 0
+
 %files
 %defattr(-, root, root, -)
 /opt/cpanel/ea-modsec30
@@ -125,6 +150,9 @@ rm -rf $RPM_BUILD_ROOT
 /etc/cpanel/ea4/modsecurity.version
 
 %changelog
+* Tue Jul 14 2026 Cory McIntire <cory.mcintire@webpros.com> - 3.0.16-4
+- EA-13497: Add a posttrans scriptlet that forces a full httpd stop-then-start on install/upgrade, guarded to be a no-op outside a real cPanel install with Apache already running - the connector's existing restart trigger is a graceful reload that cannot re-dlopen an updated libmodsecurity.so on an already-running httpd master process, so a package update alone previously left CVE/bug fixes compiled into this library silently inactive until something else eventually forced a real Apache restart
+
 * Mon Jul 13 2026 Cory McIntire <cory.mcintire@webpros.com> - 3.0.16-3
 - EA-13497: Replace the umask(0)/restore around SecAuditLogStorageDir's per-day/time-bucket mkdir() calls with an explicit chmod() to the configured directory mode after each call - idempotent, thread-safe under any MPM, and self-healing on every logged transaction, so a different account UID can always write into these directories regardless of the process's default umask
 
