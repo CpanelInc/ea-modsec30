@@ -151,7 +151,7 @@ exit 0
 
 %changelog
 * Thu Oct 15 2026 Cory McIntire <cory.mcintire@webpros.com> - 3.0.17-1
-- EA-13581: Update ea-modsec30 from v3.0.16 to v3.0.17
+- EA-13581: Update ea-modsec30 from v3.0.16 to v3.0.17 (CVE-2026-61812, CVE-2026-61813, CVE-2026-73856, CVE-2026-73857, CVE-2026-103932, CVE-2026-104259, CVE-2026-104269, GHSA-4j47-8qcr-jf59)
 
 * Tue Jul 14 2026 Cory McIntire <cory.mcintire@webpros.com> - 3.0.16-4
 - EA-13497: Add a posttrans scriptlet that forces a full httpd stop-then-start on install/upgrade, guarded to be a no-op outside a real cPanel install with Apache already running - the connector's existing restart trigger is a graceful reload that cannot re-dlopen an updated libmodsecurity.so on an already-running httpd master process, so a package update alone previously left CVE/bug fixes compiled into this library silently inactive until something else eventually forced a real Apache restart
